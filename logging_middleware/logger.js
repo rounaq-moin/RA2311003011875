@@ -60,5 +60,6 @@ async function send(payload) {
 }
 
 function getBaseUrl() {
-  return (process.env.EVAL_BASE_URL || "http://20.207.122.201/evaluation-service").replace(/\/$/, "");
+  const baseUrl = (process.env.EVAL_BASE_URL || "http://20.207.122.201/evaluation-service").replace(/\/$/, "");
+  return baseUrl.endsWith("/evaluation-service") ? baseUrl : `${baseUrl}/evaluation-service`;
 }

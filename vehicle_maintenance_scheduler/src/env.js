@@ -10,14 +10,14 @@ loadEnvFile(path.join(repoRoot, ".env"));
 loadEnvFile(path.join(appRoot, ".env"));
 
 export const config = {
-  baseUrl: cleanUrl(process.env.EVAL_BASE_URL || "http://20.207.122.201/evaluation-service"),
+  baseUrl: cleanServiceUrl(process.env.EVAL_BASE_URL || "http://20.207.122.201/evaluation-service"),
   credentials: {
-    email: process.env.EVAL_EMAIL || "",
-    name: process.env.EVAL_NAME || "",
-    rollNo: process.env.EVAL_ROLL_NO || "",
-    accessCode: process.env.EVAL_ACCESS_CODE || "",
-    clientID: process.env.EVAL_CLIENT_ID || "",
-    clientSecret: process.env.EVAL_CLIENT_SECRET || ""
+    email: getEnv("EVAL_EMAIL", "EMAIL"),
+    name: getEnv("EVAL_NAME", "NAME"),
+    rollNo: getEnv("EVAL_ROLL_NO", "ROLL_NO"),
+    accessCode: getEnv("EVAL_ACCESS_CODE", "ACCESS_CODE"),
+    clientID: getEnv("EVAL_CLIENT_ID", "CLIENT_ID"),
+    clientSecret: getEnv("EVAL_CLIENT_SECRET", "CLIENT_SECRET")
   }
 };
 
@@ -49,6 +49,11 @@ function stripQuotes(value) {
   return value;
 }
 
-function cleanUrl(value) {
-  return value.replace(/\/$/, "");
+function getEnv(primaryKey, fallbackKey) {
+  return process.env[primaryKey] || process.env[fallbackKey] || "";
+}
+
+function cleanServiceUrl(value) {
+  const baseUrl = value.replace(/\/$/, "");
+  return baseUrl.endsWith("/evaluation-service") ? baseUrl : `${baseUrl}/evaluation-service`;
 }

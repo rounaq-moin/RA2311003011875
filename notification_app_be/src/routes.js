@@ -5,6 +5,19 @@ import { getNotifications, getPriorityNotifications } from "./services/notificat
 
 export const router = express.Router();
 
+router.get("/", (request, response) => {
+  response.status(200).json({
+    status: "ok",
+    service: "notification_app_be",
+    endpoints: [
+      "GET /health",
+      "GET /notifications",
+      "GET /notifications/priority",
+      "POST /logs"
+    ]
+  });
+});
+
 router.get("/health", (request, response) => {
   response.status(200).json({ status: "ok" });
 });
