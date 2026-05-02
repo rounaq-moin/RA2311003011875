@@ -1,5 +1,6 @@
 import { Log, setToken } from "../../logging_middleware/logger.js";
 import { config } from "./env.js";
+import { fileURLToPath } from "node:url";
 
 async function main() {
   const token = await authenticate();
@@ -145,7 +146,9 @@ function assertCredentials() {
   }
 }
 
-main().catch(error => {
-  process.stderr.write(`${error.message}\n`);
-  process.exitCode = 1;
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch(error => {
+    process.stderr.write(`${error.message}\n`);
+    process.exitCode = 1;
+  });
+}

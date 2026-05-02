@@ -1,5 +1,6 @@
 import express from "express";
 import { Log } from "../../logging_middleware/logger.js";
+import { authenticate } from "./auth.js";
 import { getNotifications, getPriorityNotifications } from "./services/notificationService.js";
 
 export const router = express.Router();
@@ -9,9 +10,10 @@ router.get("/health", (request, response) => {
 });
 
 router.get("/notifications", async (request, response) => {
-  Log("backend", "info", "handler", "GET /notifications started");
-
   try {
+    await authenticate();
+    Log("backend", "info", "handler", "GET /notifications started");
+
     const notifications = await getNotifications();
     response.status(200).json(notifications);
   } catch {
@@ -21,9 +23,10 @@ router.get("/notifications", async (request, response) => {
 });
 
 router.get("/notifications/priority", async (request, response) => {
-  Log("backend", "info", "handler", "GET /notifications/priority started");
-
   try {
+    await authenticate();
+    Log("backend", "info", "handler", "GET /notifications/priority started");
+
     const notifications = await getPriorityNotifications();
     response.status(200).json(notifications);
   } catch {
@@ -34,6 +37,12 @@ router.get("/notifications/priority", async (request, response) => {
 
 router.post("/logs", (request, response) => {
   const { stack, level, package: pkg, message } = request.body || {};
-  Log(stack, level, pkg, message);
+
+  void authenticate()
+    .then(() => Log(stack, level, pkg, message))
+    .catch(() => {
+      // Frontend logging is best-effort and must never delay the UI.
+    });
+
   response.status(202).json({ status: "queued" });
 });
